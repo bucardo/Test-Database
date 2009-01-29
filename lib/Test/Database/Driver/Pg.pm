@@ -44,12 +44,12 @@ sub setup_engine {
     open my $fh, ">> $datadir/postgresql.conf"
         or die "Can't open $datadir/postgresql.conf to modify configuration";
     print $fh <<"END_PGCONF";
+        ## Test::Database changes:
         listen_addresses = ''
         port = $port
+        max_connections = 10
         unix_socket_directory = '$datadir/socket/'
         log_destination = stderr
-        #log_filename = 'postgresql.log'
-        #logging_collector = on
 END_PGCONF
     $quiet and print $fh "silent_mode = on\n";
 
