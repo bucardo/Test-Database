@@ -29,7 +29,7 @@ sub setup_engine {
     my $quiet      = $ENV{TEST_DATABASE_QUIET} || 0;
     $verbose       = !$quiet && ( $ENV{VERBOSE} || 1 );
     my $initdbargs = $ENV{TEST_DATABSE_INITDBARGS} || '';
-	my $datadir    = $ENV{TEST_DATABASE_DATADIR} || getcwd().'/test_database_pgsql';
+    my $datadir    = $ENV{TEST_DATABASE_DATADIR} || getcwd().'/test_database_pgsql';
     my $port       = $ENV{TEST_DATABASE_PORT} || 54321;
     my $initdb     = $ENV{TEST_DATABASE_INITDB} || qx{which initdb} || 'initdb';
     chomp $initdb;      # Needed if $initdb came from qx{}
@@ -71,18 +71,18 @@ sub start_engine {
 
     my $datadir = $config->{pgdata};
 
-	## Is it already running?
-	my $pidfile = "$datadir/postmaster.pid";
-	if (-e $pidfile) {
-		open my $fh, '<', $pidfile or die qq{Could not open "$pidfile": $!\n};
-		<$fh> =~ /(\d+)/ or die qq{No PID found in "$pidfile"\n};
-		my $pid = $1;
-		close $fh or die qq{Could not close "$pidfile": $!\n};
-		kill 15, $pid;
-		sleep 2;
-	}
+    ## Is it already running?
+    my $pidfile = "$datadir/postmaster.pid";
+    if (-e $pidfile) {
+        open my $fh, '<', $pidfile or die qq{Could not open "$pidfile": $!\n};
+        <$fh> =~ /(\d+)/ or die qq{No PID found in "$pidfile"\n};
+        my $pid = $1;
+        close $fh or die qq{Could not close "$pidfile": $!\n};
+        kill 15, $pid;
+        sleep 2;
+    }
 
-	unlink "$datadir/logfile";
+    unlink "$datadir/logfile";
     my $cmd     = "$pgctl -s -l $datadir/logfile -D $datadir start";
     my $output  = qx{$cmd};
     die "Error starting PostgreSQL: $output" if $output;
@@ -131,13 +131,18 @@ sub create_database {
 
      my $user = $ENV{USER} || $class->username() || 'postgres';
 
-	 my $datadir = $config->{pgdata};
-	 my $pidfile = "$datadir/postmaster.pid";
-	 # Check if database is running
+     my $datadir = $config->{pgdata};
+     my $pidfile = "$datadir/postmaster.pid";
+     # Check if database is running
      if (-e $pidfile) {
          # TODO make user configurable
          my $dbh = DBI->connect($dsn, $user, 'postgres');
-         $dbh->do("CREATE DATABASE $dbname");
+         # Check if database already exists
+         my $sql = qq{SELECT d.datname as "Name" FROM pg_catalog.pg_database d WHERE d.datname = \'$dbname\'};
+         my $result = $dbh->do($sql);
+         if ($result < 1) {
+            $dbh->do("CREATE DATABASE $dbname");
+         }
      }
 
      return Test::Database::Handle->new(
