@@ -68,6 +68,15 @@ sub start_engine {
 sub stop_engine {
     my ( $class, $config ) = @_;
 
+    chomp (my $pg_ctl = qx/which pg_ctl/);
+    $class->run_cmd(
+        $pg_ctl,
+        'stop',
+        "-D $config->{pgdata}",
+        '-m immediate'
+    );
+
+    return 1;
 }
 
 sub create_database {
