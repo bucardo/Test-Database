@@ -7,6 +7,7 @@ our @ISA = qw( Test::Database::Driver );
 
 use File::Spec;
 use DBI;
+use Data::Dumper;
 
 my ($pgctl, $verbose);
 
@@ -54,7 +55,7 @@ END_PGCONF
 
     close $fh or warn "Couldn't close postgresql.conf";
 
-    warn "PostgreSQL database instance created" if ($verbose > 0);
+    $verbose >= 1 and warn "PostgreSQL database instance created\n";
     return {
         pgdata => $datadir,
         port   => $port,
@@ -65,8 +66,6 @@ END_PGCONF
 sub start_engine {
     my ( $class, $config ) = @_;
 
-    print "Starting PostgreSQL database instance" if ($verbose > 0);
-    use Data::Dumper;
     $pgctl = $ENV{PGCTL} || qx{which pg_ctl} || 'pg_ctl';
     chomp $pgctl;
 
@@ -96,12 +95,15 @@ sub start_engine {
 sub stop_engine {
     my ( $class, $config ) = @_;
 
-    chomp (my $pg_ctl = qx/which pg_ctl/);
+    $verbose >=1 and warn "Stopping PostgreSQL database instance\n";
+    my $pg_ctl = $ENV{PGCTL} || qx{which pg_ctl} || 'pg_ctl';
+    chomp $pg_ctl;
+
     $class->run_cmd(
         $pg_ctl,
         'stop',
         "-D $config->{pgdata}",
-        '-m immediate'
+        '-m immediate',
     );
 
     return 1;
