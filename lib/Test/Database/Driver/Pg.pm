@@ -127,26 +127,27 @@ sub stop_engine {
 sub create_database {
     my ( $class, $config, $dbname ) = @_;
 
-     my $dsn = "dbi:Pg:db=postgres;host=$config->{socket};port=$config->{port}";
+    my $dsn = "dbi:Pg:db=postgres;host=$config->{socket};port=$config->{port}";
 
-     my $user = $ENV{USER} || $class->username() || 'postgres';
+    my $user = $ENV{USER} || $class->username() || 'postgres';
 
-     my $datadir = $config->{pgdata};
-     my $pidfile = "$datadir/postmaster.pid";
-     # Check if database is running
-     if (-e $pidfile) {
-         # TODO make user configurable
-         my $dbh = DBI->connect($dsn, $user, 'postgres');
-         # Check if database already exists
-         my $sql = qq{SELECT d.datname as "Name" FROM pg_catalog.pg_database d WHERE d.datname = \'$dbname\'};
-         my $result = $dbh->do($sql);
-         if ($result < 1) {
+    my $datadir = $config->{pgdata};
+    my $pidfile = "$datadir/postmaster.pid";
+    # Check if database is running
+    if (-e $pidfile) {
+        # TODO make user configurable
+        my $dbh = DBI->connect($dsn, $user, 'postgres');
+
+        # Check if database already exists
+        my $sql = qq{SELECT d.datname as "Name" FROM pg_catalog.pg_database d WHERE d.datname = \'$dbname\'};
+        my $result = $dbh->do($sql);
+        if ($result < 1) {
             $dbh->do("CREATE DATABASE $dbname");
-         }
+        }
      }
 
      return Test::Database::Handle->new(
-         dsn      => "$dsn",
+         dsn      => $dsn,
          username => $class->username(),
      );
 }
