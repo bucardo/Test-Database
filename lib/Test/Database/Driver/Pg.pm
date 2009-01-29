@@ -8,6 +8,8 @@ our @ISA = qw( Test::Database::Driver );
 use File::Spec;
 use DBI;
 
+my $verbose;
+
 sub setup_engine {
     my ($class) = @_;
 
@@ -26,7 +28,7 @@ sub setup_engine {
     my $initdb     = $ENV{INITDB} || qx{which initdb} || 'initdb';
     chomp $initdb;      # Needed if $initdb came from qx{}
     my $quiet      = $ENV{QUIET} || 0;
-    my $verbose    = !$quiet && ( $ENV{VERBOSE} || 0 );
+    $verbose       = !$quiet && ( $ENV{VERBOSE} || 0 );
     my $initdbargs = $ENV{INITDBARGS} || '';
     my $datadir    = defined $ENV{TEST_DATABASE_NOCLEANUP} ? tempdir() : tempdir( CLEANUP => 1 );
     my $port       = $ENV{TEST_DATABASE_PORT} || 54321;
@@ -59,6 +61,15 @@ END_PGCONF
 
 sub start_engine {
     my ( $class, $config ) = @_;
+
+    use Data::Dumper;
+    my $pgctl      = $ENV{PGCTL} || qx{which pg_ctl} || 'pg_ctl';
+    chomp $pgctl;
+
+    my $datadir = $config->{pgdata};
+    my $cmd     = "$pgctl -l $datadir/logfile -D $datadir start";
+    my $output  = qx{$cmd};
+    die $output;
 
     return $config;
 }
