@@ -3,6 +3,7 @@ name                        : Test-Database
 version                     : 0.02
 abstract                    : Create a database for various drivers
 author:              
+  - Philippe Bruhat
   - Greg Sabino Mullane <greg@endpoint.com>
   - Mark Johnson <mark@endpoint.com>
   - Selena Deckelmann <selenta@endpoint.com>
@@ -16,6 +17,7 @@ requires:
   DBI                       : 1.52
   perl                      : 5.006001
   File::Spec                : 0
+  File::Temp                : 0
   version                   : 0
 build_requires:
   DBI                       : 1.52
