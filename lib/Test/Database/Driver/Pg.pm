@@ -126,10 +126,10 @@ sub stop_engine {
 sub create_database {
     my ( $class, $config, $dbname ) = @_;
 
-     my $dsn = join ';', "dbi:Pg:db=postgres;host=$config->{socket}", "port=$config->{port}";
+     my $dsn = "dbi:Pg:db=postgres;host=$config->{socket};port=$config->{port}";
 
      my $user = $ENV{USER} || $class->username() || 'postgres';
-     if (!-e File::Spec->catdir($class->base_dir(), 'postgres' )) {
+     if (!-e File::Spec->catdir($class->base_dir())) {
          # TODO make user configurable
          my $dbh = DBI->connect($dsn, $user, 'postgres');
          $dbh->do ("CREATE DATABASE $dbname");
