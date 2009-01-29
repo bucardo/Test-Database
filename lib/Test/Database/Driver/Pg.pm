@@ -82,6 +82,7 @@ sub start_engine {
 		sleep 2;
 	}
 
+	unlink "$datadir/logfile";
     my $cmd     = "$pgctl -s -l $datadir/logfile -D $datadir start";
     my $output  = qx{$cmd};
     die "Error starting PostgreSQL: $output" if $output;
