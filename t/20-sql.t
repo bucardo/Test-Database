@@ -2,12 +2,13 @@ use strict;
 use warnings;
 use Test::More;
 use Test::Database;
+use Data::Dumper;
 
 my @drivers = Test::Database->drivers();
 
 # some SQL statements to try out
 my @sql = (
-    q{CREATE TABLE users (id INTEGER, name CHAR(64))},
+    q{CREATE TABLE users (id INTEGER, name VARCHAR(64))},
     q{INSERT INTO users (id, name) VALUES (1, 'book')},
     q{INSERT INTO users (id, name) VALUES (2, 'echo')},
 );
@@ -32,9 +33,7 @@ for my $driver (@drivers) {
 
         # check the data is there
         my $lines = $dbh->selectall_arrayref($select);
-        for my $row (@$lines) {
-            diag @$row, "\n";
-        }
+
         is_deeply(
             $lines,
             [ [ 1, 'book' ], [ 2, 'echo' ] ],
