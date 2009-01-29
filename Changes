@@ -1,21 +1,25 @@
 Revision history for Test-Database
 
+0.04 January 29, 2009
+
+ - Added driver for Postgres (End Point Corporation)
+
 0.02 Tue Oct 14 03:04:27 CEST 2008
-        [FEATURES]
-        - improved database engine setup process, using setup_engine(),
-          start_engine() and stop_engine() methods in the driver classes
-        [DRIVERS]
-        - add a driver for DBD::mysql
-        [TESTS]
-        - fix t/10-drivers.t to not fail on uninstalled DBD drivers
+  [FEATURES]
+  - improved database engine setup process, using setup_engine(),
+    start_engine() and stop_engine() methods in the driver classes
+  [DRIVERS]
+  - add a driver for DBD::mysql
+  [TESTS]
+  - fix t/10-drivers.t to not fail on uninstalled DBD drivers
 
 0.01 Fri Oct 10 17:44:24 CEST 2008
-        [FEATURES]
-        - provide a simple interface for obtaining a database handle
-        [DRIVERS]
-        - add a driver for DBD::SQlite
-        - add a driver for DBD::CSV
-        - add a driver for DBD::DBM
-        [TESTS]
-        - over 97% test coverage
+  [FEATURES]
+  - provide a simple interface for obtaining a database handle
+  [DRIVERS]
+  - add a driver for DBD::SQlite
+  - add a driver for DBD::CSV
+  - add a driver for DBD::DBM
+  [TESTS]
+  - over 97% test coverage
 
