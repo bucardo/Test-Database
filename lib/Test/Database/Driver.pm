@@ -24,7 +24,7 @@ my $root = File::Spec->rel2abs(
 # some information stores, indexed by driver class name
 # - key exists: routine called
 # - true value: data to be passed to next step (for setup/started)
-# - undef:      routined didn't do anything
+# - undef:      routine didn't do anything
 # - 0/'':       undecided (failure? routines usually die)
 my %init;
 my %setup;
