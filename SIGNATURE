@@ -1,0 +1,45 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA1 421f8ecfc924452f25468431ba9858146418fdf5 Build.PL
+SHA1 863969afa08df5ab63fa4caa47438b937a9fadde Changes
+SHA1 f6ae4ab7b3a506a24e81c4cb401f9e0175a50317 MANIFEST
+SHA1 f27339d246a0629e81409c73b716efdf21c286d2 META.yml
+SHA1 42319d3a46166dda88d4ae5b62b028779604b91e Makefile.PL
+SHA1 618c6e066f0b4c6e7b8c79a32498c986e05f0f47 README
+SHA1 92c79a82cdf7f19df5acaabfab5f01a7ce6a9089 eg/MyDriver.pm
+SHA1 de7413c6b781a70be754da14e03361dfb3ddde6a lib/Test/Database.pm
+SHA1 632d09af91c58c4e46426cd746cb80bced946ec1 lib/Test/Database/Driver.pm
+SHA1 a3d59cb933e99a9dfcf3b6a9f045805d6a5c43e0 lib/Test/Database/Driver/CSV.pm
+SHA1 b8fd6f10ecb70a7dc440236a873341df117955e1 lib/Test/Database/Driver/DBM.pm
+SHA1 6ba8d40961ff5855000e947788c20f347eaeb30c lib/Test/Database/Driver/SQLite.pm
+SHA1 5211fc37c81dd752a53747a4777cf5e40e4d8ec8 lib/Test/Database/Driver/mysql.pm
+SHA1 42c34628088290e84fc885cb99e33d588e1d3312 lib/Test/Database/Handle.pm
+SHA1 45aa9eb976473898d164db599622ffea61539ff8 t/00-load.t
+SHA1 c80a297d91a727cd31d4c647bb1a7dfb648c3fd1 t/07-database.t
+SHA1 9e2cace62dd4d0b597e952fde70a8dd600c9423c t/09-handle.t
+SHA1 3388c16b8b3f2c9c7705c5a6577af1c499b765e1 t/10-drivers.t
+SHA1 ea12c9411cc26f38db263c9072db57244d88f858 t/11-baddriver.t
+SHA1 a92800b44aea9a58ee28886bdebadc254dc4e3f3 t/12-gooddriver.t
+SHA1 465e3df9a1f6d04bd2b37eaa49926fdc3e0ac583 t/20-sql.t
+SHA1 2f33247f96c3f2d96d80c294e3486f836a404503 t/pod-coverage.t
+SHA1 640935336dc1123c0069bcf5432bcaedc2cf22d3 t/pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iEYEAREDAAYFAkmCF88ACgkQvJuQZxSWSsiABACg99Dd8if7qyjCDncq8U04GE4r
+VnEAoOs4rA1v5Q8d+A12hj35dcwHwgD4
+=LJ2z
+-----END PGP SIGNATURE-----
