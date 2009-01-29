@@ -7,8 +7,9 @@ our @ISA = qw( Test::Database::Driver );
 
 use File::Spec;
 use DBI;
+use Data::Dumper;
 
-my $verbose;
+my ($pgctl, $verbose);
 
 sub setup_engine {
     my ($class) = @_;
@@ -26,20 +27,19 @@ sub setup_engine {
     # Get set up
     use Cwd;
     my $quiet      = $ENV{TEST_DATABASE_QUIET} || 0;
-    $verbose       = !$quiet && ( $ENV{VERBOSE} || 0 );
+    $verbose       = !$quiet && ( $ENV{VERBOSE} || 1 );
     my $initdbargs = $ENV{TEST_DATABSE_INITDBARGS} || '';
 	my $datadir    = $ENV{TEST_DATABASE_DATADIR} || getcwd().'/test_database_pgsql';
     my $port       = $ENV{TEST_DATABASE_PORT} || 54321;
     my $initdb     = $ENV{TEST_DATABASE_INITDB} || qx{which initdb} || 'initdb';
     chomp $initdb;      # Needed if $initdb came from qx{}
-    warn "Creating PostgreSQL database instance in $datadir" if ($verbose > 0);
+    print "Creating PostgreSQL database instance in $datadir" if ($verbose > 0);
 
     # Initialize a directory
     my $cmd = "$initdb -D $datadir $initdbargs 2>&1";
     qx{$cmd};
 
     mkdir "$datadir/socket";
-    mkdir "$datadir/pg_log";
 
     open my $fh, ">> $datadir/postgresql.conf"
         or die "Can't open $datadir/postgresql.conf to modify configuration";
@@ -48,13 +48,14 @@ sub setup_engine {
         port = $port
         unix_socket_directory = '$datadir/socket/'
         log_destination = stderr
-        logging_collector = on
+        #log_filename = 'postgresql.log'
+        #logging_collector = on
 END_PGCONF
     $quiet and print $fh "silent_mode = on\n";
 
     close $fh or warn "Couldn't close postgresql.conf";
 
-    warn "PostgreSQL database instance created" if ($verbose > 0);
+    $verbose >= 1 and warn "PostgreSQL database instance created\n";
     return {
         pgdata => $datadir,
         port   => $port,
@@ -65,13 +66,28 @@ END_PGCONF
 sub start_engine {
     my ( $class, $config ) = @_;
 
-    warn "Starting PostgreSQL database instance" if ($verbose > 0);
-    my $pgctl      = $ENV{PGCTL} || qx{which pg_ctl} || 'pg_ctl';
+    $pgctl = $ENV{PGCTL} || qx{which pg_ctl} || 'pg_ctl';
     chomp $pgctl;
 
     my $datadir = $config->{pgdata};
     my $cmd     = "$pgctl -w -s -l $datadir/logfile -D $datadir start 2>&1";
     my $output  = qx{$cmd};
+    die "Error starting PostgreSQL: $output" if $output;
+
+    open my $fh, '<', "$datadir/logfile"
+        or die "Couldn't open log file $datadir/logfile: $!";
+    seek $fh, -100, 2;
+    WATCHLOG: {
+          while (<$fh>) {
+              last WATCHLOG if /system is ready/;
+          }
+          sleep 0.1;
+          seek $fh, 0, 1;
+          redo;
+    }
+    print "Database started successfully" if ($verbose > 0);
+    close $fh;
+
 
     return $config;
 }
@@ -79,15 +95,17 @@ sub start_engine {
 sub stop_engine {
     my ( $class, $config ) = @_;
 
-    warn "Stopping PostgreSQL database instance" if ($verbose > 0);
+    $verbose >=1 and warn "Stopping PostgreSQL database instance\n";
     my $pg_ctl = $ENV{PGCTL} || qx{which pg_ctl} || 'pg_ctl';
     chomp $pg_ctl;
 
     $class->run_cmd(
         $pg_ctl,
         'stop',
-        "-D $config->{pgdata}",
-        '-m immediate'
+        '-D',
+        "$config->{pgdata}",
+        '-m',
+        'immediate',
     );
 
     return 1;
