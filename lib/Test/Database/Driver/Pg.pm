@@ -27,8 +27,10 @@ sub setup_engine {
     chomp $initdb;      # Needed if $initdb came from qx{}
     my $quiet      = $ENV{QUIET} || 0;
     my $verbose    = !$quiet && ( $ENV{VERBOSE} || 0 );
+	$verbose = 1;
     my $initdbargs = $ENV{INITDBARGS} || '';
     my $datadir    = defined $ENV{TEST_DATABASE_NOCLEANUP} ? tempdir() : tempdir( CLEANUP => 1 );
+	$datadir = 'test_database_pgsql';
     my $port       = $ENV{TEST_DATABASE_PORT} || 54321;
     warn "Creating PostgreSQL database instance in $datadir" if ($verbose > 0);
 
@@ -37,10 +39,10 @@ sub setup_engine {
     qx{$cmd};
 
     mkdir "$datadir/socket"
-        || die "Couldn't make a socket directory $datadir/socket";
+        or die "Couldn't make a socket directory $datadir/socket";
 
     open my $fh, ">> $datadir/postgresql.conf"
-        || die "Can't open $datadir/postgresql.conf to modify configuration";
+        or die "Can't open $datadir/postgresql.conf to modify configuration";
     print $fh <<"END_PGCONF";
         listen_address = ''
         port = $port
@@ -48,7 +50,7 @@ sub setup_engine {
 END_PGCONF
     $verbose and print $fh "silent_mode = on\n";
 
-    close $fh || warn "Couldn't close postgresql.conf";
+    close $fh or "Couldn't close postgresql.conf";
 
     return {
         pgdata => $datadir,
