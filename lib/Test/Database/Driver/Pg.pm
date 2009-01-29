@@ -70,6 +70,18 @@ sub start_engine {
     chomp $pgctl;
 
     my $datadir = $config->{pgdata};
+
+	## Is it already running?
+	my $pidfile = "$datadir/postmaster.pid";
+	if (-e $pidfile) {
+		open my $fh, '<', $pidfile or die qq{Could not open "$pidfile": $!\n};
+		<$fh> =~ /(\d+)/ or die qq{No PID found in "$pidfile"\n};
+		my $pid = $1;
+		close $fh or die qq{Could not close "$pidfile": $!\n};
+		kill 15, $pid;
+		sleep 2;
+	}
+
     my $cmd     = "$pgctl -s -l $datadir/logfile -D $datadir start";
     my $output  = qx{$cmd};
     die "Error starting PostgreSQL: $output" if $output;
