@@ -36,7 +36,7 @@ recommends:
   Text::SpellChecker        : 0
 
 provides:
-  Test::Database
+  Test::Database:
     file                    : Database.pm
     version                 : 0.02
 
