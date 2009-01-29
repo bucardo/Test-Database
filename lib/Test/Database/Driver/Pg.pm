@@ -10,14 +10,53 @@ use DBI;
 
 sub setup_engine {
     my ($class) = @_;
-	my $config;
 
-	return $config;
+    ########################################################################
+    # Supports the following environment variables:
+    # INITDB                   -- Location of initdb binary
+    # INITDBARGS               -- Arguments to pass to initdb
+    # VERBOSE                  -- Whether or not to print a bunch of messages
+    # TEST_DATABASE_PORT       -- The port PostgreSQL should use
+    # TEST_DATABASE_NOCLEANUP  -- If defined, the database directory will stick
+    #                             around after the script exists
+
+    # Get set up
+    use File::Temp qw( tempdir );;
+    use Data::Dumper;
+    my $initdb     = $ENV{INITDB} || qx{which initdb} || 'initdb';
+    chomp $initdb;      # Needed if $initdb came from qx{}
+    my $verbose    = $ENV{VERBOSE} || 0;
+    my $initdbargs = $ENV{INITDBARGS} || '';
+    my $datadir    = defined $ENV{TEST_DATABASE_NOCLEANUP} ? tempdir() : tempdir( CLEANUP => 1 );
+    my $port       = $ENV{TEST_DATABASE_PORT} || 54321;
+    warn "Creating PostgreSQL database instance in $datadir" if ($verbose > 0);
+
+    # Initialize a directory
+    my $cmd = "$initdb -D $datadir $initdbargs 2>&1";
+    qx{$cmd};
+
+    mkdir "$datadir/socket"
+        || die "Couldn't make a socket directory $datadir/socket";
+
+    open my $fh, ">> $datadir/postgresql.conf"
+        || die "Can't open $datadir/postgresql.conf to modify configuration";
+    print $fh <<"END_PGCONF";
+        listen_address = ''
+        port = $port
+        unix_socket_directory = $datadir/socket
+END_PGCONF
+
+    close $fh || warn "Couldn't close postgresql.conf";
+
+    return {
+        pgdata => $datadir,
+        port   => $port,
+        socket => "$datadir/socket",
+    };
 }
 
 sub start_engine {
     my ( $class, $config ) = @_;
-	my $config;
 
     return $config;
 }
