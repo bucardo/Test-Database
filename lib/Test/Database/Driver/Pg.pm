@@ -66,12 +66,11 @@ sub start_engine {
     my ( $class, $config ) = @_;
 
     warn "Starting PostgreSQL database instance" if ($verbose > 0);
-    use Data::Dumper;
     my $pgctl      = $ENV{PGCTL} || qx{which pg_ctl} || 'pg_ctl';
     chomp $pgctl;
 
     my $datadir = $config->{pgdata};
-    my $cmd     = "$pgctl -s -l $datadir/logfile -D $datadir start 2>&1";
+    my $cmd     = "$pgctl -w -s -l $datadir/logfile -D $datadir start 2>&1";
     my $output  = qx{$cmd};
 
     return $config;
