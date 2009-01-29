@@ -33,7 +33,7 @@ sub setup_engine {
     my $port       = $ENV{TEST_DATABASE_PORT} || 54321;
     my $initdb     = $ENV{TEST_DATABASE_INITDB} || qx{which initdb} || 'initdb';
     chomp $initdb;      # Needed if $initdb came from qx{}
-    warn "Creating PostgreSQL database instance in $datadir" if ($verbose > 0);
+    print "Creating PostgreSQL database instance in $datadir" if ($verbose > 0);
 
     # Initialize a directory
     my $cmd = "$initdb -D $datadir $initdbargs 2>&1";
@@ -102,8 +102,10 @@ sub stop_engine {
     $class->run_cmd(
         $pg_ctl,
         'stop',
-        "-D $config->{pgdata}",
-        '-m immediate',
+        '-D',
+        "$config->{pgdata}",
+        '-m',
+        'immediate',
     );
 
     return 1;
