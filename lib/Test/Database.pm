@@ -187,7 +187,7 @@ returned.
 =item handle( $driver [, $name ] )
 
 If C<$name> is not provided, the default C<Test::Database::Handle> object
-for the driver is provided. No garantees are made on its being empty.
+for the driver is provided. No guarantees are made on its being empty.
 
 The default database handle is obtained from the local configuration
 (stored in the C<Test::Database::MyConfig> module), then from the global
@@ -196,7 +196,7 @@ configuration information is available, C<Test::Database> will then try
 to create a default temporary database, if the driver supports it.
 
 The database will be created the first time, and and subsequent calls
-are garanteed to provide connection information to the same database,
+are guaranteed to provide connection information to the same database,
 so you can share data between your scripts.
 
 =item dbh( $driver [, $name ] )
