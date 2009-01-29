@@ -13,6 +13,7 @@ my $verbose;
 sub setup_engine {
     my ($class) = @_;
 
+    # TODO: Update this documentation
     ########################################################################
     # Supports the following environment variables:
     # INITDB                   -- Location of initdb binary
@@ -23,36 +24,37 @@ sub setup_engine {
     #                             around after the script exists
 
     # Get set up
-    use File::Temp qw( tempdir );;
-    use Data::Dumper;
-    my $initdb     = $ENV{TEST_DATABASE_INITDB} || qx{which initdb} || 'initdb';
-    chomp $initdb;      # Needed if $initdb came from qx{}
+    use Cwd;
     my $quiet      = $ENV{TEST_DATABASE_QUIET} || 0;
     $verbose       = !$quiet && ( $ENV{VERBOSE} || 0 );
     my $initdbargs = $ENV{TEST_DATABSE_INITDBARGS} || '';
-    my $datadir    = defined $ENV{TEST_DATABASE_NOCLEANUP} ? tempdir() : tempdir( CLEANUP => 1 );
-	$datadir = 'test_database_pgsql';
+	my $datadir    = $ENV{TEST_DATABASE_DATADIR} || getcwd().'/test_database_pgsql';
     my $port       = $ENV{TEST_DATABASE_PORT} || 54321;
+    my $initdb     = $ENV{TEST_DATABASE_INITDB} || qx{which initdb} || 'initdb';
+    chomp $initdb;      # Needed if $initdb came from qx{}
     warn "Creating PostgreSQL database instance in $datadir" if ($verbose > 0);
 
     # Initialize a directory
     my $cmd = "$initdb -D $datadir $initdbargs 2>&1";
     qx{$cmd};
 
-    mkdir "$datadir/socket"
-        or die "Couldn't make a socket directory $datadir/socket";
+    mkdir "$datadir/socket";
+    mkdir "$datadir/pg_log";
 
     open my $fh, ">> $datadir/postgresql.conf"
         or die "Can't open $datadir/postgresql.conf to modify configuration";
     print $fh <<"END_PGCONF";
-        listen_address = ''
+        listen_addresses = ''
         port = $port
-        unix_socket_directory = $datadir/socket
+        unix_socket_directory = '$datadir/socket/'
+        log_destination = stderr
+        logging_collector = on
 END_PGCONF
-    $verbose and print $fh "silent_mode = on\n";
+    $quiet and print $fh "silent_mode = on\n";
 
-    close $fh or "Couldn't close postgresql.conf";
+    close $fh or warn "Couldn't close postgresql.conf";
 
+    warn "PostgreSQL database instance created" if ($verbose > 0);
     return {
         pgdata => $datadir,
         port   => $port,
@@ -63,14 +65,14 @@ END_PGCONF
 sub start_engine {
     my ( $class, $config ) = @_;
 
+    warn "Starting PostgreSQL database instance" if ($verbose > 0);
     use Data::Dumper;
     my $pgctl      = $ENV{PGCTL} || qx{which pg_ctl} || 'pg_ctl';
     chomp $pgctl;
 
     my $datadir = $config->{pgdata};
-    my $cmd     = "$pgctl -l $datadir/logfile -D $datadir start";
+    my $cmd     = "$pgctl -s -l $datadir/logfile -D $datadir start 2>&1";
     my $output  = qx{$cmd};
-    die $output;
 
     return $config;
 }
