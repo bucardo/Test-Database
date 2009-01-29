@@ -44,12 +44,12 @@ sub setup_engine {
     open my $fh, ">> $datadir/postgresql.conf"
         or die "Can't open $datadir/postgresql.conf to modify configuration";
     print $fh <<"END_PGCONF";
+        ## Test::Database changes:
         listen_addresses = ''
         port = $port
+        max_connections = 10
         unix_socket_directory = '$datadir/socket/'
         log_destination = stderr
-        #log_filename = 'postgresql.log'
-        #logging_collector = on
 END_PGCONF
     $quiet and print $fh "silent_mode = on\n";
 
@@ -70,7 +70,19 @@ sub start_engine {
     chomp $pgctl;
 
     my $datadir = $config->{pgdata};
-    my $cmd     = "$pgctl -s -l $datadir/logfile -D $datadir start 2>&1";
+
+	## Is it already running?
+	my $pidfile = "$datadir/postmaster.pid";
+	if (-e $pidfile) {
+		open my $fh, '<', $pidfile or die qq{Could not open "$pidfile": $!\n};
+		<$fh> =~ /(\d+)/ or die qq{No PID found in "$pidfile"\n};
+		my $pid = $1;
+		close $fh or die qq{Could not close "$pidfile": $!\n};
+		kill 15, $pid;
+		sleep 2;
+	}
+
+    my $cmd     = "$pgctl -s -l $datadir/logfile -D $datadir start";
     my $output  = qx{$cmd};
     die "Error starting PostgreSQL: $output" if $output;
 
@@ -116,13 +128,13 @@ sub create_database {
 
      my $dsn = join ';', "dbi:Pg:db=postgres;host=$config->{socket}", "port=$config->{port}";
 
-     my $user = $ENV{user} || $class->username() || 'postgres';
+     my $user = $ENV{USER} || $class->username() || 'postgres';
      if (!-e File::Spec->catdir($class->base_dir(), 'postgres' )) {
          # TODO make user configurable
          my $dbh = DBI->connect($dsn, $user, 'postgres');
          $dbh->do ("CREATE DATABASE $dbname");
      }
- 
+
      return Test::Database::Handle->new(
          dsn      => "$dsn",
          username => $class->username(),
