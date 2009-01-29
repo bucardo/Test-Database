@@ -25,7 +25,8 @@ sub setup_engine {
     use Data::Dumper;
     my $initdb     = $ENV{INITDB} || qx{which initdb} || 'initdb';
     chomp $initdb;      # Needed if $initdb came from qx{}
-    my $verbose    = $ENV{VERBOSE} || 0;
+    my $quiet      = $ENV{QUIET} || 0;
+    my $verbose    = !$quiet && ( $ENV{VERBOSE} || 0 );
     my $initdbargs = $ENV{INITDBARGS} || '';
     my $datadir    = defined $ENV{TEST_DATABASE_NOCLEANUP} ? tempdir() : tempdir( CLEANUP => 1 );
     my $port       = $ENV{TEST_DATABASE_PORT} || 54321;
@@ -45,6 +46,7 @@ sub setup_engine {
         port = $port
         unix_socket_directory = $datadir/socket
 END_PGCONF
+    $verbose and print $fh "silent_mode = on\n";
 
     close $fh || warn "Couldn't close postgresql.conf";
 
