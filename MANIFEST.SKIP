@@ -25,4 +25,3 @@ CVS/.*
 ^.lwpcookies$
 ^tmp/
 ^Test-Database-
-

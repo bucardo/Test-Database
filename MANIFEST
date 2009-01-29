@@ -1,11 +1,13 @@
 Build.PL
 Changes
+META.yml
 eg/MyDriver.pm
 lib/Test/Database.pm
 lib/Test/Database/Driver.pm
 lib/Test/Database/Driver/CSV.pm
 lib/Test/Database/Driver/DBM.pm
 lib/Test/Database/Driver/mysql.pm
+lib/Test/Database/Driver/pg.pm
 lib/Test/Database/Driver/SQLite.pm
 lib/Test/Database/Handle.pm
 Makefile.PL
