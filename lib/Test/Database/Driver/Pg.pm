@@ -70,7 +70,7 @@ sub start_engine {
     chomp $pgctl;
 
     my $datadir = $config->{pgdata};
-    my $cmd     = "$pgctl -w -s -l $datadir/logfile -D $datadir start 2>&1";
+    my $cmd     = "$pgctl -s -l $datadir/logfile -D $datadir start";
     my $output  = qx{$cmd};
     die "Error starting PostgreSQL: $output" if $output;
 
