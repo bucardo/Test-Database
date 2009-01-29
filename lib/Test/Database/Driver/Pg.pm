@@ -128,13 +128,13 @@ sub create_database {
 
      my $dsn = join ';', "dbi:Pg:db=postgres;host=$config->{socket}", "port=$config->{port}";
 
-     my $user = $ENV{user} || $class->username() || 'postgres';
+     my $user = $ENV{USER} || $class->username() || 'postgres';
      if (!-e File::Spec->catdir($class->base_dir(), 'postgres' )) {
          # TODO make user configurable
          my $dbh = DBI->connect($dsn, $user, 'postgres');
          $dbh->do ("CREATE DATABASE $dbname");
      }
- 
+
      return Test::Database::Handle->new(
          dsn      => "$dsn",
          username => $class->username(),
