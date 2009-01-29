@@ -32,6 +32,9 @@ for my $driver (@drivers) {
 
         # check the data is there
         my $lines = $dbh->selectall_arrayref($select);
+        for my $row (@$lines) {
+            diag @$row, "\n";
+        }
         is_deeply(
             $lines,
             [ [ 1, 'book' ], [ 2, 'echo' ] ],
