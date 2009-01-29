@@ -80,7 +80,10 @@ sub start_engine {
 sub stop_engine {
     my ( $class, $config ) = @_;
 
-    chomp (my $pg_ctl = qx/which pg_ctl/);
+    warn "Stopping PostgreSQL database instance" if ($verbose > 0);
+    my $pg_ctl = $ENV{PGCTL} || qx{which pg_ctl} || 'pg_ctl';
+    chomp $pg_ctl;
+
     $class->run_cmd(
         $pg_ctl,
         'stop',
