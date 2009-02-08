@@ -3,11 +3,11 @@ name                        : Test-Database
 version                     : 0.02
 abstract                    : Create a database for various drivers
 author:              
-  - Philippe Bruhat
+  - Philippe Bruhat <philippe.bruhat@free.fr>
   - Greg Sabino Mullane <greg@endpoint.com>
   - Mark Johnson <mark@endpoint.com>
   - Selena Deckelmann <selenta@endpoint.com>
-  - Josh Tolly <josh@turnstep.com>
+  - Josh Tolley <josh@turnstep.com>
 
 license                     : perl
 distribution_type           : module
@@ -50,7 +50,7 @@ resources:
   license                   : http://dev.perl.org/licenses/
   bugtracker                : http://rt.cpan.org/Public/Dist/Display.html?Name=Test-Database
   MailingList               : http://www.nntp.perl.org/group/perl.dbd.pg/
-  Repository                : http://bucardo.org/Test-Database.git
+  Repository                : http://git.bruhat.net/r/Test-Database.git/
 
 meta-spec:
   version                   : 1.4
