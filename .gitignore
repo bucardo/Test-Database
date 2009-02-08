@@ -12,3 +12,5 @@ cover_db
 *.bak
 META.yml
 mess
+test_database_pgsql*
+*~
